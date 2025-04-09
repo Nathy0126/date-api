@@ -50,6 +50,7 @@ app.get('/', (req, res) => {
   res.send('API attiva: /date');
 });
 
-app.listen(port, () => {
-  console.log(`✅ Server avviato su porta ${port}`);
+app.listen(process.env.PORT, () => {
+  console.log(`✅ Server avviato su porta ${process.env.PORT}`);
 });
+
