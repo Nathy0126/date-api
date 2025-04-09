@@ -13,10 +13,16 @@ app.use(bodyParser.json());
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
+// 🔁 Supporto sia a POST che a GET
+app.get('/date', async (req, res) => {
+  req.body = req.query;
+  return app._router.handle(req, res, () => {});
+});
+
 app.post('/date', async (req, res) => {
   try {
-    const input = req.body.input || '';
-    const oggi = req.body.oggi || new Date().toISOString().split('T')[0];
+    const input = req.body.input || req.query.input || '';
+    const oggi = req.body.oggi || req.query.oggi || new Date().toISOString().split('T')[0];
 
     const prompt = `L'utente ha scritto: "${input}"
 Oggi è: ${oggi}
@@ -33,7 +39,7 @@ Se non capisci, scrivi solo: errore.`;
     });
 
     const risposta = completion.choices[0].message.content.trim();
-    return res.json({ data: risposta });
+    return res.json({ data: risposta, errore: risposta === 'errore' });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: 'Errore nel server.' });
